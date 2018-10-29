@@ -31,6 +31,8 @@ public class PointerDrawable extends Drawable {
             paint.setColor(Color.GRAY);
             canvas.drawText("X", cx, cy, paint);
         }
+        paint.setColor(Color.GREEN);
+        canvas.drawCircle(cx, cy, 10, paint);
     }
 
     @Override
