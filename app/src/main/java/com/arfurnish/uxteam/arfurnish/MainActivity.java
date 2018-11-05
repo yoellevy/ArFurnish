@@ -15,6 +15,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.DragEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -292,7 +293,7 @@ public class MainActivity extends AppCompatActivity {
 
     String selected_tag_name ="";
 
-    public class MyLongClickListener implements View.OnLongClickListener {
+    public class MyLongClickListener implements View.OnTouchListener {
 
 
 
@@ -302,7 +303,8 @@ public class MainActivity extends AppCompatActivity {
 //            Log.i("maya", "imgView id in constructor: " + imgView.getId());
 //        }
         // Defines the one method for the interface, which is called when the View is long-clicked
-        public boolean onLongClick(View v) {
+        @Override
+        public boolean onTouch(View v, MotionEvent motionEvent){
             selected_tag_name = v.getTag().toString();
             Log.i("maya", "onLongClick, v tag: " + v.getTag());
 //            Log.i("maya", "imgView tag: " + imgView.getTag());
@@ -348,8 +350,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Sets the drag event listener for the View
         andy.setOnDragListener(new myDragEventListener("andy.sfb"));
-        andy.setOnLongClickListener(new MyLongClickListener());
-
+//        andy.setOnLongClickListener(new MyLongClickListener());
+        andy.setOnTouchListener(new MyLongClickListener());
         gallery.addView(andy);
 
         ImageView cabin = new ImageView(this);
@@ -358,7 +360,7 @@ public class MainActivity extends AppCompatActivity {
         cabin.setTag("cabin");
 
         cabin.setOnDragListener(new myDragEventListener("Cabin.sfb"));
-        cabin.setOnLongClickListener(new MyLongClickListener());
+        cabin.setOnTouchListener(new MyLongClickListener());
 
         gallery.addView(cabin);
 
@@ -368,7 +370,7 @@ public class MainActivity extends AppCompatActivity {
         house.setTag("house");
 
         house.setOnDragListener(new myDragEventListener("House.sfb"));
-        house.setOnLongClickListener(new MyLongClickListener());
+        house.setOnTouchListener(new MyLongClickListener());
         gallery.addView(house);
 
         ImageView igloo = new ImageView(this);
@@ -376,7 +378,7 @@ public class MainActivity extends AppCompatActivity {
         igloo.setContentDescription("igloo");
         igloo.setTag("igloo");
         igloo.setOnDragListener(new myDragEventListener("igloo.sfb"));
-        igloo.setOnLongClickListener(new MyLongClickListener());
+        igloo.setOnTouchListener(new MyLongClickListener());
         gallery.addView(igloo);
     }
 
