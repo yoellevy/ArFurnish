@@ -1,17 +1,29 @@
 package com.arfurnish.uxteam.arfurnish;
 
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipDescription;
+import android.content.Intent;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Point;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.DragEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.google.ar.core.Anchor;
 import com.google.ar.core.Frame;
@@ -32,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ArFragment fragment;
 
+    // no need TODO: delete
     private PointerDrawable pointer = new PointerDrawable();
     private boolean isTracking;
     private boolean isHitting;
@@ -43,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
 //        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 //        setSupportActionBar(toolbar);
 
+        // TODO: remove
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,14 +69,18 @@ public class MainActivity extends AppCompatActivity {
         fragment = (ArFragment)
                 getSupportFragmentManager().findFragmentById(R.id.sceneform_fragment);
 
+        //called every frame
         fragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
             fragment.onUpdate(frameTime);
+            //our function
             onUpdate();
         });
 
+        //Insertig thumbnails to drawer
         initializeGallery();
     }
 
+    //return if tracking in updated
     private boolean updateTracking() {
         Frame frame = fragment.getArSceneView().getArFrame();
         boolean wasTracking = isTracking;
@@ -124,6 +142,57 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    private static class MyDragShadowBuilder extends View.DragShadowBuilder {
+
+        // The drag shadow image, defined as a drawable thing
+        private static Drawable shadow;
+
+        // Defines the constructor for myDragShadowBuilder
+        public MyDragShadowBuilder(View v) {
+
+            // Stores the View parameter passed to myDragShadowBuilder.
+            super(v);
+
+            // Creates a draggable image that will fill the Canvas provided by the system.
+            shadow = new ColorDrawable(Color.LTGRAY);
+        }
+
+        // Defines a callback that sends the drag shadow dimensions and touch point back to the
+        // system.
+        @Override
+        public void onProvideShadowMetrics (Point size, Point touch) {
+            // Defines local variables
+            int width, height;
+
+            // Sets the width of the shadow to half the width of the original View
+            width = getView().getWidth() / 2;
+
+            // Sets the height of the shadow to half the height of the original View
+            height = getView().getHeight() / 2;
+
+            // The drag shadow is a ColorDrawable. This sets its dimensions to be the same as the
+            // Canvas that the system will provide. As a result, the drag shadow will fill the
+            // Canvas.
+            shadow.setBounds(0, 0, width, height);
+
+            // Sets the size parameter's width and height values. These get back to the system
+            // through the size parameter.
+            size.set(width, height);
+
+            // Sets the touch point's position to be in the middle of the drag shadow
+            touch.set(width / 2, height / 2);
+        }
+
+        // Defines a callback that draws the drag shadow in a Canvas that the system constructs
+        // from the dimensions passed in onProvideShadowMetrics().
+        @Override
+        public void onDrawShadow(Canvas canvas) {
+
+            // Draws the ColorDrawable in the Canvas passed in from the system.
+            shadow.draw(canvas);
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -139,33 +208,152 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+
+    protected class myDragEventListener implements View.OnDragListener {
+        String model_name;
+
+        public myDragEventListener(String name){model_name=name;}
+        // This is the method that the system calls when it dispatches a drag event to the
+        // listener.
+        public boolean onDrag(View v, DragEvent event) {
+
+            Log.i("maya", "inside onDrag");
+
+            // Defines a variable to store the action type for the incoming event
+            final int action = event.getAction();
+
+            // Handles each of the expected events
+            switch(action) {
+
+                case DragEvent.ACTION_DRAG_STARTED:
+                    // Determines if this View can accept the dragged data
+                    return (event.getClipDescription().hasMimeType
+                            (ClipDescription.MIMETYPE_TEXT_PLAIN));
+
+                case DragEvent.ACTION_DRAG_ENTERED:
+                    return true;
+
+                case DragEvent.ACTION_DRAG_LOCATION:
+                    return true;
+
+                case DragEvent.ACTION_DRAG_EXITED:
+                    return true;
+
+                case DragEvent.ACTION_DROP:
+
+                    // Gets the item containing the dragged data
+                    ClipData.Item item = event.getClipData().getItemAt(0);
+
+                    // Gets the text data from the item.
+                    String dragData = (String) item.getText();
+
+                    // Displays a message containing the dragged data.
+                    Toast.makeText(MainActivity.this, "Dragged data is " + dragData, Toast.LENGTH_LONG).show();
+
+                    // Returns true. DragEvent.getResult() will return true.
+                    return true;
+
+                case DragEvent.ACTION_DRAG_ENDED:
+                    // Does a getResult(), and displays what happened.
+//                    if (event.getResult()) {
+//                        Toast.makeText(MainActivity.this, "The drop was handled.", Toast.LENGTH_LONG).show();
+//
+//                    } else {
+//                        Toast.makeText(MainActivity.this, "The drop didn't work.", Toast.LENGTH_LONG).show();
+//
+//                    }
+                    addObject(Uri.parse(model_name));
+                    // returns true; the value is ignored.
+                    return true;
+
+                // An unknown action type was received.
+                default:
+                    Log.e("DragDrop Example","Unknown action type received by OnDragListener.");
+                    break;
+            }
+
+            return false;
+        }
+    }
+
+    protected class MyLongClickListener implements View.OnLongClickListener {
+
+        ImageView imgView;
+        public MyLongClickListener(ImageView imgView) {this.imgView=imgView;}
+        // Defines the one method for the interface, which is called when the View is long-clicked
+        public boolean onLongClick(View v) {
+
+//            Toast.makeText(MainActivity.this, v.getTag(), Toast.LENGTH_LONG).show();
+//            Toast.makeText(MainActivity.this, new Integer(imgView.getId()).toString(), Toast.LENGTH_LONG).show();
+
+            // Create a new ClipData.
+            // This is done in two steps to provide clarity. The convenience method
+            // ClipData.newPlainText() can create a plain text ClipData in one step.
+
+            // Create a new ClipData.Item from the ImageView object's tag
+            ClipData.Item item = new ClipData.Item((Intent) v.getTag());
+
+            // Create a new ClipData using the tag as a label, the plain text MIME type, and
+            // the already-created item. This will create a new ClipDescription object within the
+            // ClipData, and set its MIME type entry to "text/plain"
+            ClipData dragData = new ClipData((CharSequence) v.getTag(),
+                    new String[] { ClipDescription.MIMETYPE_TEXT_PLAIN }, item);
+
+            // Instantiates the drag shadow builder.
+            View.DragShadowBuilder myShadow = new MyDragShadowBuilder(imgView);
+
+            // Starts the drag
+            v.startDragAndDrop(dragData,  // the data to be dragged
+                    myShadow,  // the drag shadow builder
+                    null,      // no need to use local data
+                    0);          // flags (not currently used, set to 0)
+            return true;
+        }
+    }
+
     private void initializeGallery() {
+        Log.i("maya", "inside initializeGallery");
         LinearLayout gallery = findViewById(R.id.gallery_layout);
 
         ImageView andy = new ImageView(this);
         andy.setImageResource(R.drawable.droid_thumb);
         andy.setContentDescription("andy");
-        andy.setOnClickListener(view ->{addObject(Uri.parse("andy.sfb"));});
+//        andy.setOnClickListener(view ->{addObject(Uri.parse("andy.sfb"));});
+
+        // Sets the drag event listener for the View
+        andy.setOnDragListener(new myDragEventListener("andy.sfb"));
+        andy.setOnLongClickListener(new MyLongClickListener(andy));
+
         gallery.addView(andy);
 
         ImageView cabin = new ImageView(this);
         cabin.setImageResource(R.drawable.cabin_thumb);
         cabin.setContentDescription("cabin");
-        cabin.setOnClickListener(view ->{addObject(Uri.parse("Cabin.sfb"));});
+
+        cabin.setOnDragListener(new myDragEventListener("Cabin.sfb"));
+        cabin.setOnLongClickListener(new MyLongClickListener(cabin));
+
         gallery.addView(cabin);
 
         ImageView house = new ImageView(this);
         house.setImageResource(R.drawable.house_thumb);
         house.setContentDescription("house");
-        house.setOnClickListener(view ->{addObject(Uri.parse("House.sfb"));});
+
+        house.setOnDragListener(new myDragEventListener("House.sfb"));
+        house.setOnLongClickListener(new MyLongClickListener(house));
         gallery.addView(house);
 
         ImageView igloo = new ImageView(this);
         igloo.setImageResource(R.drawable.igloo_thumb);
         igloo.setContentDescription("igloo");
-        igloo.setOnClickListener(view ->{addObject(Uri.parse("igloo.sfb"));});
+
+        igloo.setOnDragListener(new myDragEventListener("igloo.sfb"));
+        igloo.setOnLongClickListener(new MyLongClickListener(igloo));
         gallery.addView(igloo);
     }
+
+
 
     private void addObject(Uri model) {
         Frame frame = fragment.getArSceneView().getArFrame();
