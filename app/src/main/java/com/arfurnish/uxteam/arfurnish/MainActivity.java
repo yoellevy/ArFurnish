@@ -375,9 +375,9 @@ public class MainActivity extends AppCompatActivity {
 
         ImageView igloo = new ImageView(this);
         igloo.setImageResource(R.drawable.igloo_thumb);
-        igloo.setContentDescription("igloo");
-        igloo.setTag("igloo");
-        igloo.setOnDragListener(new myDragEventListener("igloo.sfb"));
+        igloo.setContentDescription("chair");
+        igloo.setTag("chair");
+        igloo.setOnDragListener(new myDragEventListener("chair.sfb"));
         igloo.setOnTouchListener(new MyLongClickListener());
         gallery.addView(igloo);
     }

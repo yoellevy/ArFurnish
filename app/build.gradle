@@ -55,3 +55,8 @@ sceneform.asset('sampledata/models/igloo.obj',
         'default',
         'sampledata/models/igloo.sfa',
         'src/main/assets/igloo')
+
+sceneform.asset('sampledata/models/chair.obj',
+        'default',
+        'sampledata/models/chair.sfa',
+        'src/main/assets/chair')
