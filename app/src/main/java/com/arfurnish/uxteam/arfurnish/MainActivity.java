@@ -341,45 +341,45 @@ public class MainActivity extends AppCompatActivity {
         Log.i("maya", "inside initializeGallery");
         LinearLayout gallery = findViewById(R.id.gallery_layout);
 
-        ImageView andy = new ImageView(this);
-        andy.setImageResource(R.drawable.droid_thumb);
-        andy.setContentDescription("andy");
+        ImageView sofa = new ImageView(this);
+        sofa.setImageResource(R.drawable.droid_thumb);
+        sofa.setContentDescription("sofa");
 //        andy.setImageBitmap(mIconBitmap);
-        andy.setTag("andy");
+        sofa.setTag("sofa");
 //        andy.setOnClickListener(view ->{addObject(Uri.parse("andy.sfb"));});
 
         // Sets the drag event listener for the View
-        andy.setOnDragListener(new myDragEventListener("andy.sfb"));
+        sofa.setOnDragListener(new myDragEventListener("sofa.sfb"));
 //        andy.setOnLongClickListener(new MyLongClickListener());
-        andy.setOnTouchListener(new MyLongClickListener());
-        gallery.addView(andy);
+        sofa.setOnTouchListener(new MyLongClickListener());
+        gallery.addView(sofa);
 
-        ImageView cabin = new ImageView(this);
-        cabin.setImageResource(R.drawable.cabin_thumb);
-        cabin.setContentDescription("cabin");
-        cabin.setTag("cabin");
+        ImageView bookS = new ImageView(this);
+        bookS.setImageResource(R.drawable.cabin_thumb);
+        bookS.setContentDescription("book shelves");
+        bookS.setTag("book shelves");
 
-        cabin.setOnDragListener(new myDragEventListener("Cabin.sfb"));
-        cabin.setOnTouchListener(new MyLongClickListener());
+        bookS.setOnDragListener(new myDragEventListener("bookS.sfb"));
+        bookS.setOnTouchListener(new MyLongClickListener());
 
-        gallery.addView(cabin);
+        gallery.addView(bookS);
 
-        ImageView house = new ImageView(this);
-        house.setImageResource(R.drawable.house_thumb);
-        house.setContentDescription("house");
-        house.setTag("house");
+        ImageView lamp = new ImageView(this);
+        lamp.setImageResource(R.drawable.house_thumb);
+        lamp.setContentDescription("lamp");
+        lamp.setTag("lamp");
 
-        house.setOnDragListener(new myDragEventListener("House.sfb"));
-        house.setOnTouchListener(new MyLongClickListener());
-        gallery.addView(house);
+        lamp.setOnDragListener(new myDragEventListener("lamp.sfb"));
+        lamp.setOnTouchListener(new MyLongClickListener());
+        gallery.addView(lamp);
 
-        ImageView igloo = new ImageView(this);
-        igloo.setImageResource(R.drawable.igloo_thumb);
-        igloo.setContentDescription("chair");
-        igloo.setTag("chair");
-        igloo.setOnDragListener(new myDragEventListener("chair.sfb"));
-        igloo.setOnTouchListener(new MyLongClickListener());
-        gallery.addView(igloo);
+        ImageView chair = new ImageView(this);
+        chair.setImageResource(R.drawable.igloo_thumb);
+        chair.setContentDescription("chair");
+        chair.setTag("chair");
+        chair.setOnDragListener(new myDragEventListener("chair.sfb"));
+        chair.setOnTouchListener(new MyLongClickListener());
+        gallery.addView(chair);
     }
 
     private void addObject(Uri model) {

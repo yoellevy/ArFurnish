@@ -60,3 +60,18 @@ sceneform.asset('sampledata/models/chair.obj',
         'default',
         'sampledata/models/chair.sfa',
         'src/main/assets/chair')
+
+sceneform.asset('sampledata/models/bookS.obj',
+        'default',
+        'sampledata/models/bookS.sfa',
+        'src/main/assets/bookS')
+
+sceneform.asset('sampledata/models/lamp.obj',
+        'default',
+        'sampledata/models/lamp.sfa',
+        'src/main/assets/lamp')
+
+sceneform.asset('sampledata/models/sofa.obj',
+        'default',
+        'sampledata/models/sofa.sfa',
+        'src/main/assets/sofa')
