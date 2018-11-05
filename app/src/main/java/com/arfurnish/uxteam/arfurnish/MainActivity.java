@@ -3,7 +3,6 @@ package com.arfurnish.uxteam.arfurnish;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipDescription;
-import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -14,10 +13,8 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.DragEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,7 +32,6 @@ import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.Renderable;
 import com.google.ar.sceneform.ux.ArFragment;
-import com.google.ar.sceneform.ux.TransformableNode;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -111,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
 
     private android.graphics.Point getScreenCenter() {
         View vw = findViewById(android.R.id.content);
-        return new android.graphics.Point(vw.getWidth()/2, vw.getHeight()/2);
+        return new android.graphics.Point(vw.getWidth() / 2, vw.getHeight() / 2);
     }
 
     private void onUpdate() {
@@ -160,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
         // Defines a callback that sends the drag shadow dimensions and touch point back to the
         // system.
         @Override
-        public void onProvideShadowMetrics (Point size, Point touch) {
+        public void onProvideShadowMetrics(Point size, Point touch) {
             // Defines local variables
             int width, height;
 
@@ -209,38 +205,46 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     protected class myDragEventListener implements View.OnDragListener {
+
         String model_name;
 
-        public myDragEventListener(String name){model_name=name;}
+        myDragEventListener(String name) {
+            model_name = name;
+        }
+
         // This is the method that the system calls when it dispatches a drag event to the
         // listener.
         public boolean onDrag(View v, DragEvent event) {
 
-            Log.i("maya", "inside onDrag");
+//            Log.i("maya", "inside onDrag");
 
             // Defines a variable to store the action type for the incoming event
             final int action = event.getAction();
 
             // Handles each of the expected events
-            switch(action) {
+            switch (action) {
 
                 case DragEvent.ACTION_DRAG_STARTED:
+                    Log.i("maya", "ACTION_DRAG_STARTED, v tag: " + v.getTag());
                     // Determines if this View can accept the dragged data
                     return (event.getClipDescription().hasMimeType
                             (ClipDescription.MIMETYPE_TEXT_PLAIN));
 
                 case DragEvent.ACTION_DRAG_ENTERED:
+                    Log.i("maya", "ACTION_DRAG_ENTERED, v tag: " + v.getTag());
                     return true;
 
                 case DragEvent.ACTION_DRAG_LOCATION:
+                    Log.i("maya", "ACTION_DRAG_LOCATION, v tag: " + v.getTag());
                     return true;
 
                 case DragEvent.ACTION_DRAG_EXITED:
+                    Log.i("maya", "ACTION_DRAG_EXITED, v tag: " + v.getTag());
                     return true;
 
                 case DragEvent.ACTION_DROP:
+                    Log.i("maya", "ACTION_DROP, v tag: " + v.getTag());
 
                     // Gets the item containing the dragged data
                     ClipData.Item item = event.getClipData().getItemAt(0);
@@ -255,21 +259,30 @@ public class MainActivity extends AppCompatActivity {
                     return true;
 
                 case DragEvent.ACTION_DRAG_ENDED:
+                    Log.i("maya", "ACTION_DRAG_ENDED, v tag: " + v.getTag());
                     // Does a getResult(), and displays what happened.
-//                    if (event.getResult()) {
+                    Log.i("maya", "v tag: " + v.getTag() + " model: " + model_name);
+//                    Toast.makeText(MainActivity.this, "v tag: " + v.getTag() + " model: " + model_name, Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, selected_tag_name, Toast.LENGTH_LONG).show();
+                    if (selected_tag_name == v.getTag().toString()) {
+                        Toast.makeText(MainActivity.this, "The drop was handled.", Toast.LENGTH_LONG).show();
+                        addObject(Uri.parse(model_name));
+                    }
+                    if (event.getResult()) {
 //                        Toast.makeText(MainActivity.this, "The drop was handled.", Toast.LENGTH_LONG).show();
-//
-//                    } else {
+//                        addObject(Uri.parse(model_name));
+
+                    } else {
 //                        Toast.makeText(MainActivity.this, "The drop didn't work.", Toast.LENGTH_LONG).show();
-//
-//                    }
-                    addObject(Uri.parse(model_name));
+//                        addObject(Uri.parse(model_name));
+                    }
+
                     // returns true; the value is ignored.
                     return true;
 
                 // An unknown action type was received.
                 default:
-                    Log.e("DragDrop Example","Unknown action type received by OnDragListener.");
+                    Log.e("DragDrop Example", "Unknown action type received by OnDragListener.");
                     break;
             }
 
@@ -277,37 +290,47 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    protected class MyLongClickListener implements View.OnLongClickListener {
+    String selected_tag_name ="";
 
-        ImageView imgView;
-        public MyLongClickListener(ImageView imgView) {this.imgView=imgView;}
+    public class MyLongClickListener implements View.OnLongClickListener {
+
+
+
+        //        ImageView imgView;
+//        MyLongClickListener(ImageView imgView) {
+//            this.imgView=imgView;
+//            Log.i("maya", "imgView id in constructor: " + imgView.getId());
+//        }
         // Defines the one method for the interface, which is called when the View is long-clicked
         public boolean onLongClick(View v) {
-
-//            Toast.makeText(MainActivity.this, v.getTag(), Toast.LENGTH_LONG).show();
-//            Toast.makeText(MainActivity.this, new Integer(imgView.getId()).toString(), Toast.LENGTH_LONG).show();
+            selected_tag_name = v.getTag().toString();
+            Log.i("maya", "onLongClick, v tag: " + v.getTag());
+//            Log.i("maya", "imgView tag: " + imgView.getTag());
 
             // Create a new ClipData.
             // This is done in two steps to provide clarity. The convenience method
             // ClipData.newPlainText() can create a plain text ClipData in one step.
 
             // Create a new ClipData.Item from the ImageView object's tag
-            ClipData.Item item = new ClipData.Item((Intent) v.getTag());
+            ClipData.Item item = new ClipData.Item((CharSequence) v.getTag());
+//            Log.i("maya", "1");
 
             // Create a new ClipData using the tag as a label, the plain text MIME type, and
             // the already-created item. This will create a new ClipDescription object within the
             // ClipData, and set its MIME type entry to "text/plain"
             ClipData dragData = new ClipData((CharSequence) v.getTag(),
-                    new String[] { ClipDescription.MIMETYPE_TEXT_PLAIN }, item);
-
+                    new String[]{ClipDescription.MIMETYPE_TEXT_PLAIN}, item);
+//            Log.i("maya", "2");
             // Instantiates the drag shadow builder.
-            View.DragShadowBuilder myShadow = new MyDragShadowBuilder(imgView);
+            View.DragShadowBuilder myShadow = new MyDragShadowBuilder(v);
 
+//            Log.i("maya", "3");
             // Starts the drag
             v.startDragAndDrop(dragData,  // the data to be dragged
                     myShadow,  // the drag shadow builder
                     null,      // no need to use local data
                     0);          // flags (not currently used, set to 0)
+//            Log.i("maya", "4");
             return true;
         }
     }
@@ -319,41 +342,43 @@ public class MainActivity extends AppCompatActivity {
         ImageView andy = new ImageView(this);
         andy.setImageResource(R.drawable.droid_thumb);
         andy.setContentDescription("andy");
+//        andy.setImageBitmap(mIconBitmap);
+        andy.setTag("andy");
 //        andy.setOnClickListener(view ->{addObject(Uri.parse("andy.sfb"));});
 
         // Sets the drag event listener for the View
         andy.setOnDragListener(new myDragEventListener("andy.sfb"));
-        andy.setOnLongClickListener(new MyLongClickListener(andy));
+        andy.setOnLongClickListener(new MyLongClickListener());
 
         gallery.addView(andy);
 
         ImageView cabin = new ImageView(this);
         cabin.setImageResource(R.drawable.cabin_thumb);
         cabin.setContentDescription("cabin");
+        cabin.setTag("cabin");
 
         cabin.setOnDragListener(new myDragEventListener("Cabin.sfb"));
-        cabin.setOnLongClickListener(new MyLongClickListener(cabin));
+        cabin.setOnLongClickListener(new MyLongClickListener());
 
         gallery.addView(cabin);
 
         ImageView house = new ImageView(this);
         house.setImageResource(R.drawable.house_thumb);
         house.setContentDescription("house");
+        house.setTag("house");
 
         house.setOnDragListener(new myDragEventListener("House.sfb"));
-        house.setOnLongClickListener(new MyLongClickListener(house));
+        house.setOnLongClickListener(new MyLongClickListener());
         gallery.addView(house);
 
         ImageView igloo = new ImageView(this);
         igloo.setImageResource(R.drawable.igloo_thumb);
         igloo.setContentDescription("igloo");
-
+        igloo.setTag("igloo");
         igloo.setOnDragListener(new myDragEventListener("igloo.sfb"));
-        igloo.setOnLongClickListener(new MyLongClickListener(igloo));
+        igloo.setOnLongClickListener(new MyLongClickListener());
         gallery.addView(igloo);
     }
-
-
 
     private void addObject(Uri model) {
         Frame frame = fragment.getArSceneView().getArFrame();
@@ -391,7 +416,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void addNodeToScene(ArFragment fragment, Anchor anchor, Renderable renderable) {
         AnchorNode anchorNode = new AnchorNode(anchor);
-        TransformableNode node = new TransformableNode(fragment.getTransformationSystem());
+        MyNode node = new MyNode(fragment.getTransformationSystem());
         node.setRenderable(renderable);
         node.setParent(anchorNode);
         fragment.getArSceneView().getScene().addChild(anchorNode);
