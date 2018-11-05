@@ -3,6 +3,7 @@ package com.arfurnish.uxteam.arfurnish;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipDescription;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -210,7 +211,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     protected class myDragEventListener implements View.OnDragListener {
+        String model_name;
 
+        public myDragEventListener(String name){model_name=name;}
         // This is the method that the system calls when it dispatches a drag event to the
         // listener.
         public boolean onDrag(View v, DragEvent event) {
@@ -224,51 +227,17 @@ public class MainActivity extends AppCompatActivity {
             switch(action) {
 
                 case DragEvent.ACTION_DRAG_STARTED:
-
                     // Determines if this View can accept the dragged data
-                    if (event.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)) {
-
-                        // As an example of what your application might do,
-                        // applies a blue color tint to the View to indicate that it can accept
-                        // data.
-//                        v.setColorFilter(Color.BLUE);
-
-                        // Invalidate the view to force a redraw in the new tint
-//                        v.invalidate();
-
-                        // returns true to indicate that the View can accept the dragged data.
-                        return true;
-
-                    }
-
-                    // Returns false. During the current drag and drop operation, this View will
-                    // not receive events again until ACTION_DRAG_ENDED is sent.
-                    return false;
+                    return (event.getClipDescription().hasMimeType
+                            (ClipDescription.MIMETYPE_TEXT_PLAIN));
 
                 case DragEvent.ACTION_DRAG_ENTERED:
-
-                    // Applies a green tint to the View. Return true; the return value is ignored.
-
-//                    v.setColorFilter(Color.GREEN);
-
-                    // Invalidate the view to force a redraw in the new tint
-//                    v.invalidate();
-
                     return true;
 
                 case DragEvent.ACTION_DRAG_LOCATION:
-
-                    // Ignore the event
                     return true;
 
                 case DragEvent.ACTION_DRAG_EXITED:
-
-                    // Re-sets the color tint to blue. Returns true; the return value is ignored.
-//                    v.setColorFilter(Color.BLUE);
-
-                    // Invalidate the view to force a redraw in the new tint
-//                    v.invalidate();
-
                     return true;
 
                 case DragEvent.ACTION_DROP:
@@ -282,32 +251,19 @@ public class MainActivity extends AppCompatActivity {
                     // Displays a message containing the dragged data.
                     Toast.makeText(MainActivity.this, "Dragged data is " + dragData, Toast.LENGTH_LONG).show();
 
-                    // Turns off any color tints
-//                    v.clearColorFilter();
-
-                    // Invalidates the view to force a redraw
-//                    v.invalidate();
-
                     // Returns true. DragEvent.getResult() will return true.
                     return true;
 
                 case DragEvent.ACTION_DRAG_ENDED:
-
-                    // Turns off any color tinting
-//                    v.clearColorFilter();
-
-                    // Invalidates the view to force a redraw
-//                    v.invalidate();
-
                     // Does a getResult(), and displays what happened.
-                    if (event.getResult()) {
-                        Toast.makeText(MainActivity.this, "The drop was handled.", Toast.LENGTH_LONG).show();
-
-                    } else {
-                        Toast.makeText(MainActivity.this, "The drop didn't work.", Toast.LENGTH_LONG).show();
-
-                    }
-
+//                    if (event.getResult()) {
+//                        Toast.makeText(MainActivity.this, "The drop was handled.", Toast.LENGTH_LONG).show();
+//
+//                    } else {
+//                        Toast.makeText(MainActivity.this, "The drop didn't work.", Toast.LENGTH_LONG).show();
+//
+//                    }
+                    addObject(Uri.parse(model_name));
                     // returns true; the value is ignored.
                     return true;
 
@@ -319,7 +275,42 @@ public class MainActivity extends AppCompatActivity {
 
             return false;
         }
-    };
+    }
+
+    protected class MyLongClickListener implements View.OnLongClickListener {
+
+        ImageView imgView;
+        public MyLongClickListener(ImageView imgView) {this.imgView=imgView;}
+        // Defines the one method for the interface, which is called when the View is long-clicked
+        public boolean onLongClick(View v) {
+
+//            Toast.makeText(MainActivity.this, v.getTag(), Toast.LENGTH_LONG).show();
+//            Toast.makeText(MainActivity.this, new Integer(imgView.getId()).toString(), Toast.LENGTH_LONG).show();
+
+            // Create a new ClipData.
+            // This is done in two steps to provide clarity. The convenience method
+            // ClipData.newPlainText() can create a plain text ClipData in one step.
+
+            // Create a new ClipData.Item from the ImageView object's tag
+            ClipData.Item item = new ClipData.Item((Intent) v.getTag());
+
+            // Create a new ClipData using the tag as a label, the plain text MIME type, and
+            // the already-created item. This will create a new ClipDescription object within the
+            // ClipData, and set its MIME type entry to "text/plain"
+            ClipData dragData = new ClipData((CharSequence) v.getTag(),
+                    new String[] { ClipDescription.MIMETYPE_TEXT_PLAIN }, item);
+
+            // Instantiates the drag shadow builder.
+            View.DragShadowBuilder myShadow = new MyDragShadowBuilder(imgView);
+
+            // Starts the drag
+            v.startDragAndDrop(dragData,  // the data to be dragged
+                    myShadow,  // the drag shadow builder
+                    null,      // no need to use local data
+                    0);          // flags (not currently used, set to 0)
+            return true;
+        }
+    }
 
     private void initializeGallery() {
         Log.i("maya", "inside initializeGallery");
@@ -330,29 +321,35 @@ public class MainActivity extends AppCompatActivity {
         andy.setContentDescription("andy");
 //        andy.setOnClickListener(view ->{addObject(Uri.parse("andy.sfb"));});
 
-        // Creates a new drag event listener
-        myDragEventListener mDragListen = new myDragEventListener();
-
         // Sets the drag event listener for the View
-        andy.setOnDragListener(mDragListen);
+        andy.setOnDragListener(new myDragEventListener("andy.sfb"));
+        andy.setOnLongClickListener(new MyLongClickListener(andy));
+
         gallery.addView(andy);
 
         ImageView cabin = new ImageView(this);
         cabin.setImageResource(R.drawable.cabin_thumb);
         cabin.setContentDescription("cabin");
-        cabin.setOnClickListener(view ->{addObject(Uri.parse("Cabin.sfb"));});
+
+        cabin.setOnDragListener(new myDragEventListener("Cabin.sfb"));
+        cabin.setOnLongClickListener(new MyLongClickListener(cabin));
+
         gallery.addView(cabin);
 
         ImageView house = new ImageView(this);
         house.setImageResource(R.drawable.house_thumb);
         house.setContentDescription("house");
-        house.setOnClickListener(view ->{addObject(Uri.parse("House.sfb"));});
+
+        house.setOnDragListener(new myDragEventListener("House.sfb"));
+        house.setOnLongClickListener(new MyLongClickListener(house));
         gallery.addView(house);
 
         ImageView igloo = new ImageView(this);
         igloo.setImageResource(R.drawable.igloo_thumb);
         igloo.setContentDescription("igloo");
-        igloo.setOnClickListener(view ->{addObject(Uri.parse("igloo.sfb"));});
+
+        igloo.setOnDragListener(new myDragEventListener("igloo.sfb"));
+        igloo.setOnLongClickListener(new MyLongClickListener(igloo));
         gallery.addView(igloo);
     }
 
