@@ -3,9 +3,11 @@ package com.arfurnish.uxteam.arfurnish;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipDescription;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -40,6 +42,7 @@ import java.util.concurrent.CompletableFuture;
 public class MainActivity extends AppCompatActivity {
 
     private ArFragment fragment;
+    private LinearLayout gallery;
 
     // no need TODO: delete
     private PointerDrawable pointer = new PointerDrawable();
@@ -151,7 +154,10 @@ public class MainActivity extends AppCompatActivity {
             super(v);
 
             // Creates a draggable image that will fill the Canvas provided by the system.
-            shadow = new ColorDrawable(Color.LTGRAY);
+            v.setDrawingCacheEnabled(true);
+            Drawable bitMap = new BitmapDrawable(Bitmap.createBitmap(v.getDrawingCache()));
+            shadow = bitMap;
+            v.setDrawingCacheEnabled(false);
         }
 
         // Defines a callback that sends the drag shadow dimensions and touch point back to the
@@ -162,10 +168,10 @@ public class MainActivity extends AppCompatActivity {
             int width, height;
 
             // Sets the width of the shadow to half the width of the original View
-            width = getView().getWidth() / 2;
+            width = getView().getWidth();
 
             // Sets the height of the shadow to half the height of the original View
-            height = getView().getHeight() / 2;
+            height = getView().getHeight();
 
             // The drag shadow is a ColorDrawable. This sets its dimensions to be the same as the
             // Canvas that the system will provide. As a result, the drag shadow will fill the
@@ -204,6 +210,8 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
 
 
     protected class myDragEventListener implements View.OnDragListener {
@@ -267,7 +275,9 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, selected_tag_name, Toast.LENGTH_LONG).show();
                     if (selected_tag_name == v.getTag().toString()) {
                         Toast.makeText(MainActivity.this, "The drop was handled.", Toast.LENGTH_LONG).show();
-                        addObject(Uri.parse(model_name));
+                        android.graphics.Point pt = new Point((int) event.getX(),(int) event.getY());
+                        Log.i("maya", "in DragEvent.ACTION_DRAG_ENDED, point - x: " + pt.x + "     y: " + pt.y);
+                        addObject(Uri.parse(model_name), pt);
                     }
                     if (event.getResult()) {
 //                        Toast.makeText(MainActivity.this, "The drop was handled.", Toast.LENGTH_LONG).show();
@@ -337,54 +347,72 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void initializeGallery() {
-        Log.i("maya", "inside initializeGallery");
-        LinearLayout gallery = findViewById(R.id.gallery_layout);
 
-        ImageView sofa = new ImageView(this);
-        sofa.setImageResource(R.drawable.droid_thumb);
-        sofa.setContentDescription("sofa");
-//        andy.setImageBitmap(mIconBitmap);
-        sofa.setTag("sofa");
-//        andy.setOnClickListener(view ->{addObject(Uri.parse("andy.sfb"));});
-
-        // Sets the drag event listener for the View
-        sofa.setOnDragListener(new myDragEventListener("sofa.sfb"));
-//        andy.setOnLongClickListener(new MyLongClickListener());
-        sofa.setOnTouchListener(new MyLongClickListener());
-        gallery.addView(sofa);
-
-        ImageView bookS = new ImageView(this);
-        bookS.setImageResource(R.drawable.cabin_thumb);
-        bookS.setContentDescription("book shelves");
-        bookS.setTag("book shelves");
-
-        bookS.setOnDragListener(new myDragEventListener("bookS.sfb"));
-        bookS.setOnTouchListener(new MyLongClickListener());
-
-        gallery.addView(bookS);
-
-        ImageView lamp = new ImageView(this);
-        lamp.setImageResource(R.drawable.house_thumb);
-        lamp.setContentDescription("lamp");
-        lamp.setTag("lamp");
-
-        lamp.setOnDragListener(new myDragEventListener("lamp.sfb"));
-        lamp.setOnTouchListener(new MyLongClickListener());
-        gallery.addView(lamp);
-
-        ImageView chair = new ImageView(this);
-        chair.setImageResource(R.drawable.igloo_thumb);
-        chair.setContentDescription("chair");
-        chair.setTag("chair");
-        chair.setOnDragListener(new myDragEventListener("chair.sfb"));
-        chair.setOnTouchListener(new MyLongClickListener());
-        gallery.addView(chair);
+    private void addItem(String itemName){
+        ImageView itemView = new ImageView(this);
+        itemView.setImageResource(R.drawable.droid_thumb); // TODO: switch case for all images
+        itemView.setContentDescription(itemName);
+        itemView.setTag(itemName);
+        itemView.setOnDragListener(new myDragEventListener(itemName+".sfb"));
+        itemView.setOnTouchListener(new MyLongClickListener());
+        gallery.addView(itemView);
     }
 
-    private void addObject(Uri model) {
+    private void initializeGallery() {
+        Log.i("maya", "inside initializeGallery");
+        gallery = findViewById(R.id.gallery_layout);
+
+        addItem("sofa");
+        addItem("bookS");
+        addItem("lamp");
+        addItem("chair");
+
+//
+//        ImageView sofa = new ImageView(this);
+//        sofa.setImageResource(R.drawable.droid_thumb);
+//        sofa.setContentDescription("sofa");
+////        andy.setImageBitmap(mIconBitmap);
+//        sofa.setTag("sofa");
+////        andy.setOnClickListener(view ->{addObject(Uri.parse("andy.sfb"));});
+//
+//        // Sets the drag event listener for the View
+//        sofa.setOnDragListener(new myDragEventListener("sofa.sfb"));
+////        andy.setOnLongClickListener(new MyLongClickListener());
+//        sofa.setOnTouchListener(new MyLongClickListener());
+//        gallery.addView(sofa);
+//
+//        ImageView bookS = new ImageView(this);
+//        bookS.setImageResource(R.drawable.cabin_thumb);
+//        bookS.setContentDescription("book shelves");
+//        bookS.setTag("book shelves");
+//
+//        bookS.setOnDragListener(new myDragEventListener("bookS.sfb"));
+//        bookS.setOnTouchListener(new MyLongClickListener());
+//
+//        gallery.addView(bookS);
+//
+//        ImageView lamp = new ImageView(this);
+//        lamp.setImageResource(R.drawable.house_thumb);
+//        lamp.setContentDescription("lamp");
+//        lamp.setTag("lamp");
+//
+//        lamp.setOnDragListener(new myDragEventListener("lamp.sfb"));
+//        lamp.setOnTouchListener(new MyLongClickListener());
+//        gallery.addView(lamp);
+//
+//        ImageView chair = new ImageView(this);
+//        chair.setImageResource(R.drawable.igloo_thumb);
+//        chair.setContentDescription("chair");
+//        chair.setTag("chair");
+//        chair.setOnDragListener(new myDragEventListener("chair.sfb"));
+//        chair.setOnTouchListener(new MyLongClickListener());
+//        gallery.addView(chair);
+    }
+
+    private void addObject(Uri model, Point dropPoint) {
         Frame frame = fragment.getArSceneView().getArFrame();
-        android.graphics.Point pt = getScreenCenter();
+        Log.i("maya", "in addObject, point - x: " + dropPoint.x + "     y: " + dropPoint.y);
+        android.graphics.Point pt = dropPoint; //getScreenCenter();
         List<HitResult> hits;
         if (frame != null) {
             hits = frame.hitTest(pt.x, pt.y);
