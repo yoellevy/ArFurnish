@@ -3,6 +3,8 @@ package com.arfurnish.uxteam.arfurnish;
 import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipDescription;
+import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -212,8 +214,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
     protected class myDragEventListener implements View.OnDragListener {
 
         String model_name;
@@ -275,7 +275,7 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, selected_tag_name, Toast.LENGTH_LONG).show();
                     if (selected_tag_name == v.getTag().toString()) {
                         Toast.makeText(MainActivity.this, "The drop was handled.", Toast.LENGTH_LONG).show();
-                        android.graphics.Point pt = new Point((int) event.getX(),(int) event.getY());
+                        android.graphics.Point pt = new Point((int) event.getX(), (int) event.getY());
                         Log.i("maya", "in DragEvent.ACTION_DRAG_ENDED, point - x: " + pt.x + "     y: " + pt.y);
                         addObject(Uri.parse(model_name), pt);
                     }
@@ -301,10 +301,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    String selected_tag_name ="";
+    String selected_tag_name = "";
 
     public class MyLongClickListener implements View.OnTouchListener {
-
 
 
         //        ImageView imgView;
@@ -314,7 +313,7 @@ public class MainActivity extends AppCompatActivity {
 //        }
         // Defines the one method for the interface, which is called when the View is long-clicked
         @Override
-        public boolean onTouch(View v, MotionEvent motionEvent){
+        public boolean onTouch(View v, MotionEvent motionEvent) {
             selected_tag_name = v.getTag().toString();
             Log.i("maya", "onLongClick, v tag: " + v.getTag());
 //            Log.i("maya", "imgView tag: " + imgView.getTag());
@@ -348,12 +347,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void addItem(String itemName){
+    private void addItem(String itemName) {
         ImageView itemView = new ImageView(this);
-        itemView.setImageResource(R.drawable.droid_thumb); // TODO: switch case for all images
+        //adding icons
+        String iconName = itemName.equals("bookS") ? "droid_thumb" : itemName;
+        Context context = getApplicationContext();
+        Resources resources = context.getResources();
+        final int resourceId = resources.getIdentifier(iconName, "drawable",
+                context.getPackageName());
+
+        itemView.setImageResource(resourceId);
         itemView.setContentDescription(itemName);
         itemView.setTag(itemName);
-        itemView.setOnDragListener(new myDragEventListener(itemName+".sfb"));
+        itemView.setOnDragListener(new myDragEventListener(itemName + ".sfb"));
         itemView.setOnTouchListener(new MyLongClickListener());
         gallery.addView(itemView);
     }
