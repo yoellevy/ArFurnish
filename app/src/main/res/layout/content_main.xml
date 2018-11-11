@@ -8,6 +8,7 @@
     tools:context=".MainActivity"
     tools:showIn="@layout/activity_main">
 
+
     <fragment
         android:id="@+id/sceneform_fragment"
         android:name="com.google.ar.sceneform.ux.ArFragment"
@@ -27,4 +28,11 @@
         android:background="#7ea1a1a1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Drag and Drop"
+        app:layout_constraintTop_toTopOf="parent"
+        android:gravity="center"
+        android:textSize="40dp"/>
 </android.support.constraint.ConstraintLayout>
