@@ -89,6 +89,7 @@
     file: 'sampledata/models/sofa.obj',
     name: 'sofa',
     recenter: 'root',
+    scale: 3.0,
   },
   version: '0.52:1',
 }

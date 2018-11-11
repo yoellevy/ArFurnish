@@ -37,6 +37,7 @@
     file: 'sampledata/models/bookS.obj',
     name: 'bookS',
     recenter: 'root',
+    scale: 1.0,
   },
   version: '0.52:1',
 }
