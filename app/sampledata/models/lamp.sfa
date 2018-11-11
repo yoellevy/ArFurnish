@@ -193,7 +193,7 @@
     file: 'sampledata/models/lamp.obj',
     name: 'lamp',
     recenter: 'root',
-    scale: 0.56350500000000003,
+    scale: 0.156350500000000003,
   },
   version: '0.52:1',
 }
